@@ -156,7 +156,157 @@ const stays = [
     amenities: ['Meals included', 'Wi-Fi', 'Power backup'],
     tag: 'DEMO listing',
   },
+  {
+    name: 'Wadgaon Sheri Student House',
+    city: 'Pune',
+    area: 'Wadgaon Sheri, Pune',
+    type: 'Shared room',
+    price: 8900,
+    image: 'https://images.unsplash.com/photo-1522708323590-d24dbb6b0267?auto=format&fit=crop&w=900&q=85',
+    alt: 'Light-filled shared bedroom with a simple modern interior',
+    amenities: ['Shared kitchen', 'Study area', 'Wi-Fi'],
+    tag: 'DEMO listing',
+  },
+  {
+    name: 'Pimpri Corner PG',
+    city: 'Pune',
+    area: 'Pimpri, Pune',
+    type: 'PG',
+    price: 7600,
+    image: 'https://images.unsplash.com/photo-1560185008-b033106af5c3?auto=format&fit=crop&w=900&q=85',
+    alt: 'Neat shared bedroom with comfortable beds and soft daylight',
+    amenities: ['Meals included', 'Laundry', 'Power backup'],
+    tag: 'DEMO listing',
+  },
+  {
+    name: 'Hadapsar Green Stay',
+    city: 'Pune',
+    area: 'Hadapsar, Pune',
+    type: 'Hostel',
+    price: 8200,
+    image: 'https://images.unsplash.com/photo-1555854877-bab0e564b8d5?auto=format&fit=crop&w=900&q=85',
+    alt: 'Comfortable hostel room with neatly made beds',
+    amenities: ['Common room', '24/7 security', 'Wi-Fi'],
+    tag: 'DEMO listing',
+  },
+  {
+    name: 'Kharadi Shared Living',
+    city: 'Pune',
+    area: 'Kharadi, Pune',
+    type: 'Shared room',
+    price: 11800,
+    image: 'https://images.unsplash.com/photo-1616486338812-3dadae4b4ace?auto=format&fit=crop&w=900&q=85',
+    alt: 'Thoughtfully furnished apartment interior with a shared lounge',
+    amenities: ['Desk space', 'Housekeeping', 'Wi-Fi'],
+    tag: 'DEMO listing',
+  },
+  {
+    name: 'Kharadi Student PG',
+    city: 'Pune',
+    area: 'Kharadi, Pune',
+    type: 'PG',
+    price: 9800,
+    image: 'https://images.unsplash.com/photo-1600607687939-ce8a6c25118c?auto=format&fit=crop&w=900&q=85',
+    alt: 'Sunlit shared apartment with a welcoming lounge',
+    amenities: ['Meals included', 'Study area', 'Wi-Fi'],
+    tag: 'DEMO listing',
+  },
+  {
+    name: 'Kalyani Nagar House',
+    city: 'Pune',
+    area: 'Kalyani Nagar, Pune',
+    type: 'PG',
+    price: 15800,
+    image: 'https://images.unsplash.com/photo-1600607687920-4e2a09cf159d?auto=format&fit=crop&w=900&q=85',
+    alt: 'Comfortable contemporary living space with natural light',
+    amenities: ['Meals included', 'Gym access', 'Housekeeping'],
+    tag: 'DEMO listing',
+  },
+  {
+    name: 'Pimple Saudagar Hostel',
+    city: 'Pune',
+    area: 'Pimple Saudagar, Pune',
+    type: 'Hostel',
+    price: 6900,
+    image: 'https://images.unsplash.com/photo-1564078516393-cf04bd966897?auto=format&fit=crop&w=900&q=85',
+    alt: 'Shared accommodation bedroom with tidy beds and warm lighting',
+    amenities: ['Common room', 'Laundry', 'Study area'],
+    tag: 'DEMO listing',
+  },
+  {
+    name: 'Balewadi Grove Rooms',
+    city: 'Pune',
+    area: 'Balewadi, Pune',
+    type: 'Shared room',
+    price: 13200,
+    image: 'https://images.unsplash.com/photo-1600210492486-724fe5c67fb0?auto=format&fit=crop&w=900&q=85',
+    alt: 'Welcoming shared lounge with comfortable seating and warm finishes',
+    amenities: ['Shared kitchen', 'Cleaning', 'Study lounge'],
+    tag: 'DEMO listing',
+  },
+  {
+    name: 'Warje Student PG',
+    city: 'Pune',
+    area: 'Warje, Pune',
+    type: 'PG',
+    price: 9200,
+    image: 'https://images.unsplash.com/photo-1600607687939-ce8a6c25118c?auto=format&fit=crop&w=900&q=85',
+    alt: 'Sunlit shared apartment with a welcoming lounge',
+    amenities: ['Home-style meals', 'Power backup', 'Wi-Fi'],
+    tag: 'DEMO listing',
+  },
+  {
+    name: 'Katraj Corner Hostel',
+    city: 'Pune',
+    area: 'Katraj, Pune',
+    type: 'Hostel',
+    price: 6400,
+    image: 'https://images.unsplash.com/photo-1560185008-b033106af5c3?auto=format&fit=crop&w=900&q=85',
+    alt: 'Neat shared bedroom with comfortable beds and soft daylight',
+    amenities: ['24/7 security', 'Common room', 'Laundry'],
+    tag: 'DEMO listing',
+  },
+  {
+    name: 'Chinchwad Study Stay',
+    city: 'Pune',
+    area: 'Chinchwad, Pune',
+    type: 'Shared room',
+    price: 10400,
+    image: 'https://images.unsplash.com/photo-1522708323590-d24dbb6b0267?auto=format&fit=crop&w=900&q=85',
+    alt: 'Light-filled apartment bedroom with a simple modern interior',
+    amenities: ['Study desk', 'Shared kitchen', 'Wi-Fi'],
+    tag: 'DEMO listing',
+  },
+  {
+    name: 'Nigdi Willow House',
+    city: 'Pune',
+    area: 'Nigdi, Pune',
+    type: 'PG',
+    price: 8600,
+    image: 'https://images.unsplash.com/photo-1616486029423-aaa4789e8c9a?auto=format&fit=crop&w=900&q=85',
+    alt: 'Airy shared living space with plants and green accents',
+    amenities: ['Meals included', 'Housekeeping', 'Wi-Fi'],
+    tag: 'DEMO listing',
+  },
+  {
+    name: 'Ravet Shared Nest',
+    city: 'Pune',
+    area: 'Ravet, Pune',
+    type: 'Shared room',
+    price: 9700,
+    image: 'https://images.unsplash.com/photo-1616486338812-3dadae4b4ace?auto=format&fit=crop&w=900&q=85',
+    alt: 'Thoughtfully furnished apartment interior with a shared lounge',
+    amenities: ['Shared kitchen', 'Desk space', 'Power backup'],
+    tag: 'DEMO listing',
+  },
 ]
+
+const normalizeLocality = (locality) => locality.trim().replace(/\s+/g, ' ').toLowerCase()
+const getLocality = (area) => area.split(',')[0].replace(/\s+phase\s+\d+$/i, '').trim().replace(/\s+/g, ' ')
+const localities = [...new Map(stays.map((stay) => {
+  const locality = getLocality(stay.area)
+  return [normalizeLocality(locality), locality]
+})).values()].sort((first, second) => first.localeCompare(second))
 
 const formatPrice = (amount) => `₹${amount.toLocaleString('en-IN')}`
 
@@ -193,12 +343,13 @@ function Navbar() {
 
 function SearchPanel({ onSearch }) {
   const [city, setCity] = useState('')
+  const [locality, setLocality] = useState('')
   const [type, setType] = useState('Any type')
   const [budget, setBudget] = useState('Any budget')
 
   function handleSubmit(event) {
     event.preventDefault()
-    onSearch({ city, type, budget })
+    onSearch({ city, locality, type, budget })
   }
 
   return (
@@ -209,6 +360,13 @@ function SearchPanel({ onSearch }) {
           <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M19 10c0 5-7 11-7 11S5 15 5 10a7 7 0 1 1 14 0Z" /><circle cx="12" cy="10" r="2.5" /></svg>
           <input type="text" value={city} onChange={(event) => setCity(event.target.value)} placeholder="City or neighborhood" aria-label="City or neighborhood" />
         </span>
+      </label>
+      <label className="search-field">
+        <span className="field-label">Locality</span>
+        <select value={locality} onChange={(event) => setLocality(event.target.value)} aria-label="Locality">
+          <option value="">All localities</option>
+          {localities.map((option) => <option key={normalizeLocality(option)} value={option}>{option}</option>)}
+        </select>
       </label>
       <label className="search-field">
         <span className="field-label">Stay type</span>
@@ -287,12 +445,13 @@ function Footer() {
 }
 
 function App() {
-  const [filters, setFilters] = useState({ city: '', type: 'Any type', budget: 'Any budget' })
+  const [filters, setFilters] = useState({ city: '', locality: '', type: 'Any type', budget: 'Any budget' })
   const filteredStays = stays.filter((stay) => {
     const matchesCity = !filters.city || `${stay.area} ${stay.city}`.toLowerCase().includes(filters.city.toLowerCase())
+    const matchesLocality = !filters.locality || normalizeLocality(getLocality(stay.area)) === normalizeLocality(filters.locality)
     const matchesType = filters.type === 'Any type' || stay.type === filters.type
-    const matchesBudget = filters.budget === 'Any budget' || stay.price <= Number(filters.budget)
-    return matchesCity && matchesType && matchesBudget
+    const matchesBudget = filters.budget === 'Any budget' || stay.price < Number(filters.budget)
+    return matchesCity && matchesLocality && matchesType && matchesBudget
   })
 
   return (
@@ -322,7 +481,7 @@ function App() {
           {filteredStays.length > 0 ? (
             <div className="stay-grid">{filteredStays.map((stay) => <StayCard key={stay.name} stay={stay} />)}</div>
           ) : (
-            <div className="empty-state"><span aria-hidden="true">⌕</span><h3>No sample stays match those filters</h3><p>Try another city, accommodation type, or budget.</p><button type="button" onClick={() => setFilters({ city: '', type: 'Any type', budget: 'Any budget' })}>Show all stays</button></div>
+            <div className="empty-state"><span aria-hidden="true">⌕</span><h3>No sample stays match those filters</h3><p>Try another city, locality, accommodation type, or budget.</p><button type="button" onClick={() => setFilters({ city: '', locality: '', type: 'Any type', budget: 'Any budget' })}>Show all stays</button></div>
           )}
         </section>
         <WhyChooseUs />
