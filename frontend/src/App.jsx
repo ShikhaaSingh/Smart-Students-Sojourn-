@@ -1,4 +1,4 @@
-import { useState } from 'react'
+import { useEffect, useRef, useState } from 'react'
 import './App.css'
 
 const stays = [
@@ -388,9 +388,22 @@ function SearchPanel({ onSearch }) {
   )
 }
 
-function StayCard({ stay }) {
+function StayCard({ stay, onSelect }) {
   return (
-    <article className="stay-card">
+    <article
+      className="stay-card"
+      role="button"
+      tabIndex={0}
+      aria-haspopup="dialog"
+      aria-label={`View details for ${stay.name}`}
+      onClick={() => onSelect(stay)}
+      onKeyDown={(event) => {
+        if (event.key === 'Enter' || event.key === ' ') {
+          event.preventDefault()
+          onSelect(stay)
+        }
+      }}
+    >
       <div className="stay-image-wrap">
         <img className="stay-image" src={stay.image} alt={stay.alt} loading="lazy" />
         <span className="stay-type">{stay.type}</span>
@@ -405,10 +418,74 @@ function StayCard({ stay }) {
         <div className="amenities" aria-label="Amenities">{stay.amenities.map((amenity) => <span key={amenity}>{amenity}</span>)}</div>
         <div className="stay-card-bottom">
           <p><strong>{formatPrice(stay.price)}</strong><span> / month</span></p>
-          <a href="#contact" aria-label={`Ask us about ${stay.name}`}>View stay <span aria-hidden="true">↗</span></a>
+          <span className="stay-details-link">View details <span aria-hidden="true">↗</span></span>
         </div>
       </div>
     </article>
+  )
+}
+
+function StayDetailsModal({ stay, onClose }) {
+  const dialogRef = useRef(null)
+
+  useEffect(() => {
+    const dialog = dialogRef.current
+    if (!stay || !dialog) return
+
+    if (!dialog.open) dialog.showModal()
+    return () => {
+      if (dialog.open) dialog.close()
+    }
+  }, [stay])
+
+  if (!stay) return <dialog ref={dialogRef} className="stay-dialog" />
+
+  const locality = getLocality(stay.area)
+
+  return (
+    <dialog
+      ref={dialogRef}
+      className="stay-dialog"
+      aria-labelledby="stay-dialog-title"
+      aria-describedby="stay-dialog-description"
+      onCancel={(event) => {
+        event.preventDefault()
+        onClose()
+      }}
+      onKeyDown={(event) => {
+        if (event.key === 'Escape') {
+          event.preventDefault()
+          onClose()
+        }
+      }}
+    >
+      <div className="stay-dialog-layout">
+        <img className="stay-dialog-image" src={stay.image} alt={stay.alt} />
+        <div className="stay-dialog-content">
+          <div className="stay-dialog-topline">
+            <p className="stay-dialog-tag">{stay.tag}</p>
+            <button className="stay-dialog-close" type="button" onClick={onClose}>Close</button>
+          </div>
+          <h2 id="stay-dialog-title">{stay.name}</h2>
+          <dl className="stay-dialog-facts">
+            <div><dt>City</dt><dd>{stay.city}</dd></div>
+            <div><dt>Locality</dt><dd>{locality}</dd></div>
+            <div><dt>Accommodation type</dt><dd>{stay.type}</dd></div>
+            <div><dt>Monthly rent</dt><dd>{formatPrice(stay.price)}</dd></div>
+          </dl>
+          <section className="stay-dialog-section">
+            <h3>About this stay</h3>
+            <p id="stay-dialog-description">Demo {stay.type.toLowerCase()} accommodation in {locality}, {stay.city}. This sample listing is not verified or currently available.</p>
+          </section>
+          <section className="stay-dialog-section">
+            <h3>Available amenities</h3>
+            <ul className="stay-dialog-amenities">
+              {stay.amenities.map((amenity) => <li key={amenity}>{amenity}</li>)}
+            </ul>
+          </section>
+        </div>
+      </div>
+    </dialog>
   )
 }
 
@@ -446,6 +523,7 @@ function Footer() {
 
 function App() {
   const [filters, setFilters] = useState({ city: '', locality: '', type: 'Any type', budget: 'Any budget' })
+  const [selectedStay, setSelectedStay] = useState(null)
   const filteredStays = stays.filter((stay) => {
     const matchesCity = !filters.city || `${stay.area} ${stay.city}`.toLowerCase().includes(filters.city.toLowerCase())
     const matchesLocality = !filters.locality || normalizeLocality(getLocality(stay.area)) === normalizeLocality(filters.locality)
@@ -479,7 +557,7 @@ function App() {
           <div className="section-heading"><div><p className="eyebrow">A good place to begin</p><h2>Stay a little <span>closer</span></h2></div><p className="section-aside">A few ideas for your next address.<br />Your story starts wherever you land.</p></div>
           <p className="sample-note">All listings are DEMO samples, not verified or currently available.</p>
           {filteredStays.length > 0 ? (
-            <div className="stay-grid">{filteredStays.map((stay) => <StayCard key={stay.name} stay={stay} />)}</div>
+            <div className="stay-grid">{filteredStays.map((stay) => <StayCard key={stay.name} stay={stay} onSelect={setSelectedStay} />)}</div>
           ) : (
             <div className="empty-state"><span aria-hidden="true">⌕</span><h3>No sample stays match those filters</h3><p>Try another city, locality, accommodation type, or budget.</p><button type="button" onClick={() => setFilters({ city: '', locality: '', type: 'Any type', budget: 'Any budget' })}>Show all stays</button></div>
           )}
@@ -487,6 +565,7 @@ function App() {
         <WhyChooseUs />
       </main>
       <Footer />
+      <StayDetailsModal stay={selectedStay} onClose={() => setSelectedStay(null)} />
     </>
   )
 }
