@@ -996,3 +996,34 @@
 @media (prefers-reduced-motion: reduce) {
   *, *::before, *::after { animation-duration: 0.01ms !important; animation-iteration-count: 1 !important; scroll-behavior: auto !important; transition-duration: 0.01ms !important; }
 }
+
+.listing-status {
+  padding: 36px 20px;
+  border: 1px solid #e1e7de;
+  border-radius: 3px;
+  color: #56685b;
+  background: #f8faf5;
+  font-size: 13px;
+  text-align: center;
+}
+
+.listing-error {
+  border-color: #e8c9bf;
+  color: #873f31;
+  background: #fff8f5;
+}
+
+.listing-error p {
+  margin: 0;
+}
+
+.listing-error button {
+  margin-top: 12px;
+  padding: 9px 13px;
+  border: 0;
+  border-radius: 2px;
+  color: white;
+  background: var(--forest);
+  cursor: pointer;
+  font: 700 11px var(--sans);
+}

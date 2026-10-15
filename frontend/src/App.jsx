@@ -1,7 +1,7 @@
 import { useEffect, useRef, useState } from 'react'
 import './App.css'
 
-const stays = [
+const stayImagePresets = [
   {
     name: 'Campus Corner PG',
     city: 'Pune',
@@ -303,12 +303,27 @@ const stays = [
 
 const normalizeLocality = (locality) => locality.trim().replace(/\s+/g, ' ').toLowerCase()
 const getLocality = (area) => area.split(',')[0].replace(/\s+phase\s+\d+$/i, '').trim().replace(/\s+/g, ' ')
-const localities = [...new Map(stays.map((stay) => {
-  const locality = getLocality(stay.area)
-  return [normalizeLocality(locality), locality]
-})).values()].sort((first, second) => first.localeCompare(second))
+const intendedLocalities = [
+  'Balewadi', 'Baner', 'Chinchwad', 'Hadapsar', 'Hinjawadi', 'Kalyani Nagar', 'Karve Nagar',
+  'Katraj', 'Kharadi', 'Kothrud', 'Nigdi', 'Pimpri', 'Pimple Saudagar', 'Ravet', 'Viman Nagar',
+  'Wadgaon Sheri', 'Wakad', 'Warje',
+]
 
 const formatPrice = (amount) => `₹${amount.toLocaleString('en-IN')}`
+
+function mapAccommodation(accommodation, index) {
+  const imagePreset = stayImagePresets[index % stayImagePresets.length]
+
+  return {
+    ...accommodation,
+    area: `${accommodation.locality}, ${accommodation.city}`,
+    type: accommodation.accommodationType,
+    price: accommodation.monthlyRent,
+    image: imagePreset.image,
+    alt: imagePreset.alt,
+    tag: 'DEMO listing',
+  }
+}
 
 function BrandMark() {
   return (
@@ -341,7 +356,7 @@ function Navbar() {
   )
 }
 
-function SearchPanel({ onSearch }) {
+function SearchPanel({ onSearch, localities }) {
   const [city, setCity] = useState('')
   const [locality, setLocality] = useState('')
   const [type, setType] = useState('Any type')
@@ -475,7 +490,7 @@ function StayDetailsModal({ stay, onClose }) {
           </dl>
           <section className="stay-dialog-section">
             <h3>About this stay</h3>
-            <p id="stay-dialog-description">Demo {stay.type.toLowerCase()} accommodation in {locality}, {stay.city}. This sample listing is not verified or currently available.</p>
+            <p id="stay-dialog-description">{stay.description}</p>
           </section>
           <section className="stay-dialog-section">
             <h3>Available amenities</h3>
@@ -522,8 +537,45 @@ function Footer() {
 }
 
 function App() {
+  const [stays, setStays] = useState([])
+  const [isLoading, setIsLoading] = useState(true)
+  const [loadError, setLoadError] = useState('')
+  const [retryCount, setRetryCount] = useState(0)
   const [filters, setFilters] = useState({ city: '', locality: '', type: 'Any type', budget: 'Any budget' })
   const [selectedStay, setSelectedStay] = useState(null)
+
+  useEffect(() => {
+    const controller = new AbortController()
+
+    async function loadAccommodations() {
+      setIsLoading(true)
+      setLoadError('')
+
+      try {
+        const response = await fetch('http://localhost:8080/api/accommodations', { signal: controller.signal })
+        if (!response.ok) throw new Error(`Request failed (${response.status})`)
+
+        const accommodations = await response.json()
+        if (!Array.isArray(accommodations)) throw new Error('The API returned an unexpected response.')
+
+        setStays(accommodations.map(mapAccommodation))
+      } catch (error) {
+        if (error.name !== 'AbortError') {
+          setLoadError('Could not load accommodation listings. Check that the Spring Boot backend is running, then try again.')
+        }
+      } finally {
+        if (!controller.signal.aborted) setIsLoading(false)
+      }
+    }
+
+    loadAccommodations()
+    return () => controller.abort()
+  }, [retryCount])
+
+  const localities = [...new Map([...intendedLocalities, ...stays.map((stay) => getLocality(stay.area))].map((locality) => {
+    return [normalizeLocality(locality), locality]
+  })).values()].sort((first, second) => first.localeCompare(second))
+
   const filteredStays = stays.filter((stay) => {
     const matchesCity = !filters.city || `${stay.area} ${stay.city}`.toLowerCase().includes(filters.city.toLowerCase())
     const matchesLocality = !filters.locality || normalizeLocality(getLocality(stay.area)) === normalizeLocality(filters.locality)
@@ -549,17 +601,25 @@ function App() {
               <div className="hero-sticker"><span className="sticker-sun" aria-hidden="true">✳</span><span>Room to<br />feel at home</span></div>
               <div className="hero-photo-caption"><span className="caption-dot" /> A fresh start, your way</div>
             </div>
-            <div className="search-wrap"><SearchPanel onSearch={setFilters} /></div>
+            <div className="search-wrap"><SearchPanel onSearch={setFilters} localities={localities} /></div>
           </div>
           <div className="hero-curve" aria-hidden="true" />
         </section>
         <section className="featured-section" id="stays">
           <div className="section-heading"><div><p className="eyebrow">A good place to begin</p><h2>Stay a little <span>closer</span></h2></div><p className="section-aside">A few ideas for your next address.<br />Your story starts wherever you land.</p></div>
           <p className="sample-note">All listings are DEMO samples, not verified or currently available.</p>
-          {filteredStays.length > 0 ? (
-            <div className="stay-grid">{filteredStays.map((stay) => <StayCard key={stay.name} stay={stay} onSelect={setSelectedStay} />)}</div>
+          <p className="sample-note">Listings are loaded from the Smart Student Sojourn accommodation service.</p>
+          {isLoading ? (
+            <div className="listing-status" role="status">Loading accommodation listings...</div>
+          ) : loadError ? (
+            <div className="listing-status listing-error" role="alert">
+              <p>{loadError}</p>
+              <button type="button" onClick={() => setRetryCount((count) => count + 1)}>Try again</button>
+            </div>
+          ) : filteredStays.length > 0 ? (
+            <div className="stay-grid">{filteredStays.map((stay) => <StayCard key={stay.id} stay={stay} onSelect={setSelectedStay} />)}</div>
           ) : (
-            <div className="empty-state"><span aria-hidden="true">⌕</span><h3>No sample stays match those filters</h3><p>Try another city, locality, accommodation type, or budget.</p><button type="button" onClick={() => setFilters({ city: '', locality: '', type: 'Any type', budget: 'Any budget' })}>Show all stays</button></div>
+            <div className="empty-state"><span aria-hidden="true">⌕</span><h3>No stays match those filters</h3><p>Try another city, locality, accommodation type, or budget.</p><button type="button" onClick={() => setFilters({ city: '', locality: '', type: 'Any type', budget: 'Any budget' })}>Show all stays</button></div>
           )}
         </section>
         <WhyChooseUs />
