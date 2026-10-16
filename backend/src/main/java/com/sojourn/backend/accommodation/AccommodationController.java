@@ -1,4 +1,3 @@
-
 package com.sojourn.backend.accommodation;
 
 import java.util.List;
@@ -6,6 +5,7 @@ import java.util.List;
 import org.springframework.web.bind.annotation.CrossOrigin;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 @RestController
@@ -20,8 +20,18 @@ public class AccommodationController {
     }
 
     @GetMapping
-    public List<Accommodation> getAccommodations() {
-        return accommodationService.getAllAccommodations();
+    public List<Accommodation> getAccommodations(
+            @RequestParam(required = false) String city,
+            @RequestParam(required = false) String locality,
+            @RequestParam(name = "type", required = false) String type,
+            @RequestParam(required = false) Integer maxRent) {
+
+        return accommodationService.searchAccommodations(
+                city,
+                locality,
+                type,
+                maxRent
+        );
     }
 
     public record Accommodation(
