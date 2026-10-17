@@ -1,6 +1,7 @@
 
 package com.sojourn.backend.accommodation;
 
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 
@@ -16,27 +17,50 @@ public class AccommodationService {
         this.jdbcTemplate = jdbcTemplate;
     }
 
-    // Fetches accommodation listings from MySQL.
     public List<AccommodationController.Accommodation> getAllAccommodations() {
         return searchAccommodations(null, null, null, null);
     }
 
-    // Fetches database records and applies the optional search filters.
     public List<AccommodationController.Accommodation> searchAccommodations(
             String city,
             String locality,
             String type,
             Integer maxRent) {
 
-        String sql = """
+        StringBuilder sql = new StringBuilder("""
                 SELECT id, name, city, locality, accommodation_type,
                        monthly_rent, description, amenities
                 FROM accommodations
-                ORDER BY id
-                """;
+                WHERE 1 = 1
+                """);
 
-        List<AccommodationController.Accommodation> accommodations =
-                jdbcTemplate.query(sql, (rs, rowNum) -> {
+        List<Object> params = new ArrayList<>();
+
+        if (city != null && !city.isBlank()) {
+            sql.append(" AND LOWER(city) = LOWER(?)");
+            params.add(city.trim());
+        }
+
+        if (locality != null && !locality.isBlank()) {
+            sql.append(" AND LOWER(locality) = LOWER(?)");
+            params.add(locality.trim());
+        }
+
+        if (type != null && !type.isBlank()) {
+            sql.append(" AND LOWER(accommodation_type) = LOWER(?)");
+            params.add(type.trim());
+        }
+
+        if (maxRent != null) {
+            sql.append(" AND monthly_rent <= ?");
+            params.add(maxRent);
+        }
+
+        sql.append(" ORDER BY id");
+
+        return jdbcTemplate.query(
+                sql.toString(),
+                (rs, rowNum) -> {
                     String amenitiesText = rs.getString("amenities");
 
                     List<String> amenities =
@@ -57,17 +81,8 @@ public class AccommodationService {
                             rs.getString("description"),
                             amenities
                     );
-                });
-
-        return accommodations.stream()
-                .filter(stay -> city == null || city.isBlank()
-                        || stay.city().equalsIgnoreCase(city.trim()))
-                .filter(stay -> locality == null || locality.isBlank()
-                        || stay.locality().equalsIgnoreCase(locality.trim()))
-                .filter(stay -> type == null || type.isBlank()
-                        || stay.accommodationType().equalsIgnoreCase(type.trim()))
-                .filter(stay -> maxRent == null
-                        || stay.monthlyRent() <= maxRent)
-                .toList();
+                },
+                params.toArray()
+        );
     }
 }
