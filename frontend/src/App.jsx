@@ -368,6 +368,20 @@ function SearchPanel({ onSearch, localities }) {
     onSearch({ city, locality, type, budget })
   }
 
+  function handleReset() {
+    setCity('')
+    setLocality('')
+    setType('Any type')
+    setBudget('Any budget')
+
+    onSearch({
+      city: '',
+      locality: '',
+      type: 'Any type',
+      budget: 'Any budget',
+    })
+  }
+
   return (
     <form className="search-panel" onSubmit={handleSubmit}>
       <label className="search-field location-field">
@@ -434,16 +448,35 @@ function SearchPanel({ onSearch, localities }) {
         </select>
       </label>
 
-      <button className="search-button" type="submit" aria-label="Search stays">
+      <button
+        className="search-button"
+        type="submit"
+        aria-label="Search stays"
+      >
         <svg viewBox="0 0 24 24" aria-hidden="true">
           <circle cx="10.8" cy="10.8" r="6.8" />
           <path d="m16 16 4 4" />
         </svg>
         <span>Search stays</span>
       </button>
-    </form>
+
+     
+      <button
+        className="reset-button"
+        type="button"
+        onClick={handleReset}
+        aria-label="Reset all filters"
+      >
+        <svg viewBox="0 0 24 24" aria-hidden="true">
+          <path d="M20 7v5h-5" />
+          <path d="M20 12a8 8 0 1 1-2.34-5.66L20 9" />
+        </svg>
+        <span>Reset Filters</span>
+      </button>
+       </form>
   )
 }
+
 
 
 function StayCard({ stay, onSelect }) {

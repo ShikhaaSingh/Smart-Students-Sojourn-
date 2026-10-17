@@ -287,7 +287,7 @@
 .search-panel {
   display: grid;
   min-height: 91px;
-  grid-template-columns: 1.35fr 0.9fr 0.9fr 1fr auto;
+  grid-template-columns: 1.35fr 0.9fr 0.9fr 1fr auto auto;
   align-items: center;
   gap: 12px;
   padding: 13px 14px 13px 23px;
@@ -307,6 +307,43 @@
   padding-left: 19px;
   border-left: 1px solid #e6e9e2;
 }
+
+.reset-button {
+  box-sizing: border-box;
+  display: inline-flex;
+  height: 54px;
+  min-height: 54px;
+  align-items: center;
+  justify-content: center;
+  gap: 9px;
+  padding: 0 18px;
+  border: 0;
+  border-radius: 3px;
+  color: white;
+  background: var(--forest);
+  cursor: pointer;
+  font: 700 12px var(--sans);
+  white-space: nowrap;
+  transition: background 160ms ease, transform 160ms ease;
+}
+
+.reset-button:hover {
+  background: #285342;
+  transform: translateY(-1px);
+}
+
+.reset-button svg {
+  display: block;
+  width: 17px;
+  height: 17px;
+  flex-shrink: 0;
+  stroke: currentColor;
+  stroke-width: 2;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+  fill: none;
+}
+
 
 .location-field {
   padding-left: 0;
