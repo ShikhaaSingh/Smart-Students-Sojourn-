@@ -356,6 +356,7 @@ function Navbar() {
   )
 }
 
+
 function SearchPanel({ onSearch, localities }) {
   const [city, setCity] = useState('')
   const [locality, setLocality] = useState('')
@@ -372,36 +373,78 @@ function SearchPanel({ onSearch, localities }) {
       <label className="search-field location-field">
         <span className="field-label">Where to?</span>
         <span className="field-control">
-          <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M19 10c0 5-7 11-7 11S5 15 5 10a7 7 0 1 1 14 0Z" /><circle cx="12" cy="10" r="2.5" /></svg>
-          <input type="text" value={city} onChange={(event) => setCity(event.target.value)} placeholder="City or neighborhood" aria-label="City or neighborhood" />
+          <svg viewBox="0 0 24 24" aria-hidden="true">
+            <path d="M19 10c0 5-7 11-7 11S5 15 5 10a7 7 0 1 1 14 0Z" />
+            <circle cx="12" cy="10" r="2.5" />
+          </svg>
+          <input
+            type="text"
+            value={city}
+            onChange={(event) => setCity(event.target.value)}
+            placeholder="City or neighborhood"
+            aria-label="City or neighborhood"
+          />
         </span>
       </label>
+
       <label className="search-field">
         <span className="field-label">Locality</span>
-        <select value={locality} onChange={(event) => setLocality(event.target.value)} aria-label="Locality">
+        <select
+          value={locality}
+          onChange={(event) => setLocality(event.target.value)}
+          aria-label="Locality"
+        >
           <option value="">All localities</option>
-          {localities.map((option) => <option key={normalizeLocality(option)} value={option}>{option}</option>)}
+          {localities.map((option) => (
+            <option key={normalizeLocality(option)} value={option}>
+              {option}
+            </option>
+          ))}
         </select>
       </label>
+
       <label className="search-field">
         <span className="field-label">Stay type</span>
-        <select value={type} onChange={(event) => setType(event.target.value)} aria-label="Accommodation type">
-          <option>Any type</option><option>PG</option><option>Hostel</option><option>Shared room</option>
+        <select
+          value={type}
+          onChange={(event) => setType(event.target.value)}
+          aria-label="Accommodation type"
+        >
+          <option>Any type</option>
+          <option>PG</option>
+          <option>Hostel</option>
+          <option>Shared room</option>
         </select>
       </label>
+
       <label className="search-field">
         <span className="field-label">Monthly budget</span>
-        <select value={budget} onChange={(event) => setBudget(event.target.value)} aria-label="Monthly budget">
-          <option>Any budget</option><option value="10000">Under ₹10,000</option><option value="15000">Under ₹15,000</option><option value="20000">Under ₹20,000</option>
+        <select
+          value={budget}
+          onChange={(event) => setBudget(event.target.value)}
+          aria-label="Monthly budget"
+        >
+          <option>Any budget</option>
+          <option value="7000">Under ₹7,000</option>
+          <option value="8000">Under ₹8,000</option>
+          <option value="9000">Under ₹9,000</option>
+          <option value="10000">Under ₹10,000</option>
+          <option value="15000">Under ₹15,000</option>
+          <option value="20000">Under ₹20,000</option>
         </select>
       </label>
+
       <button className="search-button" type="submit" aria-label="Search stays">
-        <svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="10.8" cy="10.8" r="6.8" /><path d="m16 16 4 4" /></svg>
+        <svg viewBox="0 0 24 24" aria-hidden="true">
+          <circle cx="10.8" cy="10.8" r="6.8" />
+          <path d="m16 16 4 4" />
+        </svg>
         <span>Search stays</span>
       </button>
     </form>
   )
 }
+
 
 function StayCard({ stay, onSelect }) {
   return (
