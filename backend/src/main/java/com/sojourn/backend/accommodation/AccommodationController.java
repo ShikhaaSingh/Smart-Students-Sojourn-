@@ -1,6 +1,9 @@
+
 package com.sojourn.backend.accommodation;
 
 import java.util.List;
+
+import jakarta.validation.constraints.Min;
 
 import org.springframework.web.bind.annotation.CrossOrigin;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -24,7 +27,9 @@ public class AccommodationController {
             @RequestParam(required = false) String city,
             @RequestParam(required = false) String locality,
             @RequestParam(name = "type", required = false) String type,
-            @RequestParam(required = false) Integer maxRent) {
+            @RequestParam(required = false)
+            @Min(value = 0, message = "Maximum rent cannot be negative")
+            Integer maxRent) {
 
         return accommodationService.searchAccommodations(
                 city,

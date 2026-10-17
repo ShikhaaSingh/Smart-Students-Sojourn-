@@ -1,3 +1,4 @@
+
 package com.sojourn.backend;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
@@ -10,15 +11,24 @@ import java.util.stream.Collectors;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.boot.webmvc.test.autoconfigure.AutoConfigureMockMvc;
+import org.springframework.test.web.servlet.MockMvc;
+
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
 import com.sojourn.backend.accommodation.AccommodationController;
 import com.sojourn.backend.accommodation.AccommodationService;
 
 @SpringBootTest
+@AutoConfigureMockMvc
 class BackendApplicationTests {
 
     @Autowired
     private AccommodationService accommodationService;
+
+    @Autowired
+    private MockMvc mockMvc;
 
     @Test
     void contextLoads() {
@@ -32,8 +42,8 @@ class BackendApplicationTests {
                 accommodationService.getAllAccommodations();
 
         Set<String> actualLocalities = accommodations.stream()
-        .map(stay -> stay.locality())
-        .collect(Collectors.toSet());
+                .map(stay -> stay.locality())
+                .collect(Collectors.toSet());
 
         Set<String> expectedLocalities = Set.of(
                 "Balewadi",
@@ -88,4 +98,11 @@ class BackendApplicationTests {
         assertEquals(1, results.size());
         assertEquals("Hinjawadi", results.get(0).locality());
     }
+
+   @Test
+    void rejectsNegativeMaximumRent() throws Exception {
+    mockMvc.perform(get("/api/accommodations")
+            .param("maxRent", "-500"))
+            .andExpect(status().isBadRequest());
+ }
 }
