@@ -1,51 +1,87 @@
-# Smart Student Sojourn 🏡
 
-A full-stack accommodation discovery platform designed to help students find PGs and hostels while relocating to a new city.
+# 🏡 Smart Student Sojourn
 
-Smart Student Sojourn simplifies accommodation discovery with searchable listings, budget-based filtering, locality selection, and detailed accommodation information through a clean and user-friendly interface.
+**A Full-Stack Student Accommodation Discovery Platform with AI-Powered Natural Language Search**
+
+Smart Student Sojourn helps students discover suitable PGs and hostels based on their location, accommodation preferences, and budget. The application combines a React frontend, Spring Boot REST APIs, MySQL database, and Google Gemini AI to make accommodation searching simpler and more intuitive.
+
+> **Project Status:** Developed with sample accommodation data for demonstration. Listing availability and prices have not been independently verified in real time.
 
 ## ✨ Features
 
-- **Accommodation Listings:** Browse PG and hostel accommodation options.
-- **City & Locality Filters:** Narrow down listings by city and locality.
-- **Accommodation Type:** Filter listings by accommodation type.
-- **Budget Filtering:** Find accommodations within your selected rent limit.
-- **Sorting:** Arrange listings using the available sorting options.
-- **Accommodation Details:** View additional information and amenities in a details modal.
-- **Database Integration:** Retrieve accommodation data through a Spring Boot REST API backed by MySQL.
-- **Responsive UI:** A clean interface built with React and CSS.
+### 🏠 Accommodation Discovery
+- Browse PG and hostel listings.
+- View accommodation details, pricing, and amenities.
+- Filter listings by city, locality, accommodation type, and budget.
+- Sort and explore available sample listings.
+- View additional information through an accommodation details modal.
 
-> **Note:** The current listings include demo data for development and demonstration. They do not represent verified vacancies or confirmed accommodation availability.
+### 🤖 AI-Powered Search
+- Search using natural language instead of selecting every filter manually.
+- Use queries such as:
+  - `Find a PG in Hinjawadi under 10000 with Wi-Fi`
+  - `Show hostels in Pune under 8000`
+  - `Find accommodation in Kharadi`
+- Use Google Gemini to extract relevant search criteria from a query.
+- Retrieve matching accommodation records from MySQL through the Spring Boot backend.
+- View matching results in a slide-out AI search panel.
+- Receive loading and error feedback during searches.
+
+**How the AI search works:**
+
+1. The user enters a natural-language accommodation request.
+2. Gemini interprets the request and extracts relevant search criteria.
+3. The Spring Boot backend uses those criteria to search the database.
+4. Matching database records are returned by the API.
+5. The frontend displays the results to the user.
+
+The AI helps interpret the search request; accommodation results come from the application's database rather than being invented by the AI.
 
 ## 🛠️ Tech Stack
 
 | Layer | Technologies |
 |---|---|
 | Frontend | React, Vite, JavaScript, CSS |
-| Backend | Java, Spring Boot |
+| Backend | Java 21, Spring Boot, REST APIs |
 | Database | MySQL |
-| API | REST API, JSON |
+| AI Integration | Google Gemini API |
+| API Communication | HTTP, JSON |
 | Build Tool | Maven |
 | Version Control | Git, GitHub |
 
 ## 🏗️ Architecture
 
-The application follows a frontend–backend architecture:
+```text
+┌─────────────────────────────┐
+│     React + Vite Frontend   │
+│  Listings, Filters, AI UI   │
+└──────────────┬──────────────┘
+               │ HTTP / JSON
+               ▼
+┌─────────────────────────────┐
+│    Spring Boot REST APIs    │
+│ Filtering and Search Logic  │
+└──────────────┬──────────────┘
+               │
+       ┌───────┴────────┐
+       ▼                ▼
+┌──────────────┐  ┌────────────────┐
+│    MySQL     │  │  Google Gemini │
+│ Accommodation│  │ Query Parsing  │
+│    Records   │  │   for AI Search│
+└──────────────┘  └────────────────┘
+```
 
-1. **React frontend** provides the accommodation listings, filters, sorting, and details interface.
-2. **Spring Boot backend** exposes REST endpoints and processes accommodation search parameters.
-3. **MySQL database** stores the accommodation records retrieved by the backend.
-4. **REST API** connects the frontend to the backend and returns accommodation data in JSON format.
-
-## 📂 Project Structure
+## 📁 Project Structure
 
 ```text
-Smart-Students-Sojourn/
+Smart-Student-Sojourn/
 ├── frontend/
 │   ├── src/
 │   │   ├── App.jsx
 │   │   └── App.css
 │   └── package.json
+│
 ├── backend/
 │   ├── src/
 │   │   ├── main/
@@ -53,36 +89,44 @@ Smart-Students-Sojourn/
 │   │   │   └── resources/
 │   │   └── test/
 │   └── pom.xml
+│
 └── README.md
 ```
 
+*The exact package and component structure may evolve as the project develops.*
+
 ## 🚀 Getting Started
+
+Follow these steps to run the project locally.
 
 ### Prerequisites
 
-Make sure you have the following installed:
+Install the following tools:
 
-- Java 21
-- Node.js and npm
-- MySQL Server
-- Git
+- [Java JDK 21](https://adoptium.net/)
+- [Node.js and npm](https://nodejs.org/)
+- [MySQL](https://dev.mysql.com/downloads/)
+- [Git](https://git-scm.com/)
+- A Google Gemini API key for AI-powered search
 
-### 1. Clone the repository
+### 1. Clone the Repository
 
 ```bash
 git clone https://github.com/ShikhaaSingh/Smart-Students-Sojourn-.git
 cd Smart-Students-Sojourn-
 ```
 
-### 2. Configure the database
+### 2. Configure the MySQL Database
 
-Create the MySQL database:
+Start your MySQL server and create the database:
 
 ```sql
 CREATE DATABASE smart_student_sojourn;
 ```
 
-Configure the database connection in `backend/src/main/resources/application.properties`:
+Configure the database connection in:
+
+`backend/src/main/resources/application.properties`
 
 ```properties
 spring.application.name=backend
@@ -91,40 +135,57 @@ spring.datasource.username=sojourn_app
 spring.datasource.password=${DB_PASSWORD}
 ```
 
-Ensure that the MySQL user exists, has the required database permissions, and that the accommodation table and data are set up before starting the application.
+Make sure the MySQL user `sojourn_app` exists and has the necessary permissions for the database. Use your actual database password through the `DB_PASSWORD` environment variable.
 
-Set the database password through the `DB_PASSWORD` environment variable. Do not commit real credentials to GitHub.
+If the project requires initial accommodation records, make sure the database is populated using the project's existing schema and data setup.
 
-### 3. Start the backend
+### 3. Configure Environment Variables
 
-Open a terminal in the project directory and run:
+The backend uses environment variables for sensitive credentials.
+
+On Windows PowerShell, navigate to the backend folder:
 
 ```powershell
 cd backend
 ```
 
-Set the password in PowerShell without displaying it:
+Set the MySQL password securely:
 
 ```powershell
-$secure = Read-Host "Enter MySQL password" -AsSecureString
-$env:DB_PASSWORD = [System.Net.NetworkCredential]::new("", $secure).Password
+$secureDb = Read-Host "Enter MySQL password" -AsSecureString
+$env:DB_PASSWORD = [System.Net.NetworkCredential]::new("", $secureDb).Password
 ```
 
-Start the Spring Boot application:
+Set your Gemini API key securely:
+
+```powershell
+$secureGemini = Read-Host "Enter Gemini API key" -AsSecureString
+$env:GEMINI_API_KEY = [System.Net.NetworkCredential]::new("", $secureGemini).Password
+```
+
+Get a Gemini API key through [Google AI Studio](https://aistudio.google.com/).
+
+**Security note:** Never commit API keys, database passwords, or other secrets to GitHub. These environment variables must be configured again in any new terminal session used to run the backend.
+
+### 4. Run the Spring Boot Backend
+
+From the `backend` directory, run:
 
 ```powershell
 .\mvnw.cmd spring-boot:run
 ```
 
-The backend runs at:
+The backend should start at:
 
 `http://localhost:8080`
 
-### 4. Start the frontend
+Keep this terminal open while using the application.
 
-Open a second terminal:
+### 5. Run the React Frontend
 
-```powershell
+Open a second terminal and navigate to the frontend directory:
+
+```bash
 cd frontend
 npm install
 npm run dev
@@ -134,55 +195,68 @@ Open the local URL displayed by Vite, usually:
 
 `http://localhost:5173`
 
-## 🔌 API Endpoint
+## 🔌 API Endpoints
 
-### Get accommodation listings
+### Accommodation API
 
-```http
-GET /api/accommodations
-```
+| Method | Endpoint | Description |
+|---|---|---|
+| GET | `/api/accommodations` | Retrieve and filter accommodation listings |
 
-The endpoint supports optional search parameters:
-
-| Parameter | Purpose |
-|---|---|
-| `city` | Filter by city |
-| `locality` | Filter by locality |
-| `type` | Filter by accommodation type |
-| `maxRent` | Set the maximum monthly rent |
-
-Example:
+Example request:
 
 ```http
 GET http://localhost:8080/api/accommodations?city=Pune&maxRent=10000
 ```
 
-Negative `maxRent` values are rejected by request validation.
+Supported filters depend on the backend implementation and may include city, locality, accommodation type, and maximum rent.
 
-## 🧪 Testing
+### AI Search API
 
-Run the backend tests from the `backend` directory:
+| Method | Endpoint | Description |
+|---|---|---|
+| GET | `/api/ai/search?message=...` | Interpret a natural-language query and search matching accommodation records |
+
+Example request:
+
+```http
+GET http://localhost:8080/api/ai/search?message=Find%20a%20PG%20in%20Hinjawadi%20under%2010000%20with%20Wi-Fi
+```
+
+The endpoint uses Gemini to interpret the query and the backend to retrieve matching database records. AI search requires a valid `GEMINI_API_KEY` and a running backend with the required database configuration.
+
+## 🧪 Running Tests
+
+From the `backend` directory, run:
 
 ```powershell
 .\mvnw.cmd test
 ```
 
-The backend test suite currently passes **5 tests**.
+Make sure any environment variables required by the test configuration are set before running the test suite.
+
+## 🔒 Data and Availability Disclaimer
+
+This project currently demonstrates accommodation discovery using sample data. Prices, amenities, and listings are intended for application testing and demonstration; they do not guarantee that a property exists, has current availability, or offers the displayed price.
+
+AI search filters the records available in the application's database. It does not independently verify accommodation availability.
 
 ## 🔮 Future Improvements
 
-- User authentication and profile management
-- Verified accommodation listings and availability
-- Booking or enquiry functionality
+- User registration and authentication
+- Student profiles and saved accommodations
+- Booking and enquiry workflows
 - Map-based accommodation discovery
-- Image uploads and richer listing galleries
-- Deployment with a hosted backend and database
+- Accommodation owner listings and image uploads
+- Verified property information and availability
+- Deployment with production configuration and monitoring
 
 ## 👩‍💻 Author
 
 **Shikha Singh**
 
 - GitHub: [ShikhaaSingh](https://github.com/ShikhaaSingh)
+- Project Repository: [Smart Student Sojourn](https://github.com/ShikhaaSingh/Smart-Students-Sojourn-)
 
 ---
 
