@@ -387,6 +387,7 @@ function StayDetailsModal({ stay, onClose }) {
   )
 }
 
+
 function AiSearchPanel({
   message,
   setMessage,
@@ -395,75 +396,174 @@ function AiSearchPanel({
   isLoading,
   isActive,
   error,
+  isOpen,
+  onClose,
+  results,
+  onSelectStay,
 }) {
+  if (!isOpen) return null
+
+  const suggestions = [
+    'Find a PG in Hinjawadi under ₹10,000',
+    'Find a stay with Wi-Fi',
+    'Find a hostel in Pune',
+  ]
+
   return (
-    <section className="ai-search-panel" aria-labelledby="ai-search-title">
-      <div className="ai-search-copy">
-        <p className="eyebrow">A smarter way to find your stay</p>
-        <h2 id="ai-search-title">
-          Tell us what you <span>need.</span>
-        </h2>
-        <p>
-          Describe your budget, preferred locality, stay type, or amenities
-          in everyday language. AI will search our accommodation database.
-        </p>
-        <p className="ai-search-example">
-          Try: “Find a PG in Hinjawadi under ₹10,000 with Wi-Fi.”
-        </p>
-      </div>
+    <div className="ai-drawer-layer">
+      <button
+        className="ai-drawer-backdrop"
+        type="button"
+        aria-label="Close AI assistant"
+        onClick={onClose}
+      />
 
-      <form className="ai-search-form" onSubmit={onSubmit}>
-        <label htmlFor="ai-search-input">
-          Describe your ideal accommodation
-        </label>
+      <aside
+        className="ai-drawer"
+        role="dialog"
+        aria-modal="true"
+        aria-labelledby="ai-drawer-title"
+      >
+        <header className="ai-drawer-header">
+          <div className="ai-drawer-brand">
+            <span className="ai-drawer-icon">✦</span>
+            <div>
+              <h2 id="ai-drawer-title">AI Stay Assistant</h2>
+              <p>Find a stay that fits your needs</p>
+            </div>
+          </div>
 
-        <textarea
-          id="ai-search-input"
-          value={message}
-          onChange={(event) => setMessage(event.target.value)}
-          placeholder="e.g. Find a PG in Hinjawadi under ₹10,000 with Wi-Fi"
-          rows={3}
-          maxLength={1000}
-          required
-          disabled={isLoading}
-        />
-
-        <div className="ai-search-actions">
           <button
-            className="search-button"
-            type="submit"
-            disabled={isLoading}
+            className="ai-drawer-close"
+            type="button"
+            onClick={onClose}
+            aria-label="Close assistant"
           >
-            {isLoading ? 'Searching...' : '✦ Search with AI'}
+            ×
           </button>
+        </header>
+
+        <div className="ai-drawer-content">
+          <div className="ai-welcome-message">
+            <span className="ai-message-icon">✦</span>
+            <div>
+              <strong>Hi there! 👋</strong>
+              <p>
+                Tell me your preferred locality, budget, stay type, or
+                amenities. I’ll search the accommodation database for you.
+              </p>
+            </div>
+          </div>
+
+          <p className="ai-suggestions-label">Try asking</p>
+
+          <div className="ai-suggestion-list">
+            {suggestions.map((suggestion) => (
+              <button
+                key={suggestion}
+                type="button"
+                className="ai-suggestion-chip"
+                disabled={isLoading}
+                onClick={() => setMessage(suggestion)}
+              >
+                {suggestion} <span aria-hidden="true">↗</span>
+              </button>
+            ))}
+          </div>
 
           {isActive && (
-            <button
-              className="reset-button"
-              type="button"
-              onClick={onClear}
-              disabled={isLoading}
-            >
-              Clear AI search
-            </button>
+            <div className="ai-drawer-results" aria-live="polite">
+              <h3>
+                {results.length > 0
+                  ? `${results.length} matching stay${results.length === 1 ? '' : 's'}`
+                  : 'No matching stays found'}
+              </h3>
+
+              {results.length === 0 ? (
+                <p>
+                  Try a different locality, budget, stay type, or amenity.
+                </p>
+              ) : (
+                results.map((stay) => (
+                  <button
+                    type="button"
+                    className="ai-result-card"
+                    key={stay.id}
+                    onClick={() => onSelectStay(stay)}
+                  >
+                    <img src={stay.image} alt={stay.alt} />
+                    <span className="ai-result-info">
+                      <strong>{stay.name}</strong>
+                      <span>{stay.area}</span>
+                      <strong>{formatPrice(stay.price)} / month</strong>
+                      <span className="ai-result-amenities">
+                        {stay.amenities.join(' · ')}
+                      </span>
+                    </span>
+                    <span aria-hidden="true">↗</span>
+                  </button>
+                ))
+              )}
+            </div>
+          )}
+
+          {error && (
+            <p className="ai-search-error" role="alert">{error}</p>
           )}
         </div>
 
-        {isLoading && (
-          <p className="ai-search-feedback" role="status">
-            Understanding your requirements and searching the database...
-          </p>
-        )}
+        <form className="ai-drawer-form" onSubmit={onSubmit}>
+          <label htmlFor="ai-drawer-input">
+            What kind of stay are you looking for?
+          </label>
 
-        {error && (
-          <p className="ai-search-error" role="alert">
-            {error}
+          <textarea
+            id="ai-drawer-input"
+            value={message}
+            onChange={(event) => setMessage(event.target.value)}
+            placeholder="e.g. PG in Hinjawadi under ₹10,000 with Wi-Fi"
+            rows={3}
+            maxLength={1000}
+            required
+            disabled={isLoading}
+          />
+
+          {isLoading && (
+            <p className="ai-search-feedback" role="status">
+              Searching accommodations...
+            </p>
+          )}
+
+          <div className="ai-drawer-actions">
+            <button
+              className="search-button"
+              type="submit"
+              disabled={isLoading}
+            >
+              {isLoading ? 'Searching...' : '✦ Find my stay'}
+            </button>
+
+            {isActive && (
+              <button
+                className="reset-button"
+                type="button"
+                onClick={onClear}
+                disabled={isLoading}
+              >
+                Clear
+              </button>
+            )}
+          </div>
+
+          <p className="ai-demo-note">
+            Demo listings only. Availability is not verified.
           </p>
-        )}
-      </form>
-    </section>
+        </form>
+      </aside>
+    </div>
   )
 }
+
 
 function WhyChooseUs() {
   return (
@@ -568,6 +668,7 @@ function App() {
   const [aiError, setAiError] = useState('')
   const [aiSearchActive, setAiSearchActive] = useState(false)
   const [aiResults, setAiResults] = useState([])
+  const [isAiPanelOpen, setIsAiPanelOpen] = useState(false)
 
   useEffect(() => {
     const controller = new AbortController()
@@ -724,6 +825,32 @@ function App() {
     <>
       <Navbar />
 
+      <button
+      type="button"
+      className="ai-floating-button"
+      onClick={() => setIsAiPanelOpen(true)}
+      aria-label="Open AI Stay Assistant"
+      >
+      ✦ Ask AI
+      </button>
+
+      <AiSearchPanel
+      message={aiMessage}
+      setMessage={setAiMessage}
+      onSubmit={handleAiSearch}
+      onClear={clearAiSearch}
+      isLoading={aiLoading}
+      isActive={aiSearchActive}
+      error={aiError}
+      isOpen={isAiPanelOpen}
+      onClose={() => setIsAiPanelOpen(false)}
+      results={aiResults}
+      onSelectStay={(stay) => {
+      setSelectedStay(stay)
+      setIsAiPanelOpen(false)
+      }}
+      />
+
       <main>
         <section className="hero" id="home">
           <div className="hero-inner">
@@ -776,15 +903,6 @@ function App() {
         </section>
 
         <section className="featured-section" id="stays">
-          <AiSearchPanel
-            message={aiMessage}
-            setMessage={setAiMessage}
-            onSubmit={handleAiSearch}
-            onClear={clearAiSearch}
-            isLoading={aiLoading}
-            isActive={aiSearchActive}
-            error={aiError}
-          />
 
           <div className="section-heading">
             <div>
