@@ -1,5 +1,8 @@
+
 import { useEffect, useRef, useState } from 'react'
 import './App.css'
+
+const API_BASE_URL = 'http://localhost:8080/api'
 
 const stayImagePresets = [
   {
@@ -54,10 +57,10 @@ const stayImagePresets = [
   },
 ]
 
-const normalizeLocality = (locality) =>
+const normalizeLocality = (locality = '') =>
   locality.trim().replace(/\s+/g, ' ').toLowerCase()
 
-const getLocality = (area) =>
+const getLocality = (area = '') =>
   area.split(',')[0].replace(/\s+phase\s+\d+$/i, '').trim().replace(/\s+/g, ' ')
 
 const intendedLocalities = [
@@ -81,9 +84,10 @@ const intendedLocalities = [
   'Warje',
 ]
 
-const formatPrice = (amount) => `₹${amount.toLocaleString('en-IN')}`
+const formatPrice = (amount) =>
+  `₹${Number(amount || 0).toLocaleString('en-IN')}`
 
-function mapAccommodation(accommodation, index) {
+function mapAccommodation(accommodation, index = 0) {
   const imagePreset = stayImagePresets[index % stayImagePresets.length]
 
   return {
@@ -94,6 +98,9 @@ function mapAccommodation(accommodation, index) {
     image: imagePreset.image,
     alt: imagePreset.alt,
     tag: 'DEMO listing',
+    amenities: Array.isArray(accommodation.amenities)
+      ? accommodation.amenities
+      : [],
   }
 }
 
@@ -122,7 +129,9 @@ function Navbar() {
           <a className="nav-link" href="#about">About</a>
           <a className="nav-link" href="#contact">Contact</a>
         </nav>
-        <a className="nav-cta" href="#stays">Find your place <span aria-hidden="true">↗</span></a>
+        <a className="nav-cta" href="#stays">
+          Find your place <span aria-hidden="true">↗</span>
+        </a>
       </div>
     </header>
   )
@@ -260,9 +269,15 @@ function StayCard({ stay, onSelect }) {
       }}
     >
       <div className="stay-image-wrap">
-        <img className="stay-image" src={stay.image} alt={stay.alt} loading="lazy" />
+        <img
+          className="stay-image"
+          src={stay.image}
+          alt={stay.alt}
+          loading="lazy"
+        />
         <span className="stay-type">{stay.type}</span>
       </div>
+
       <div className="stay-card-content">
         <p className="stay-tag">{stay.tag}</p>
         <h3>{stay.name}</h3>
@@ -273,14 +288,21 @@ function StayCard({ stay, onSelect }) {
           </svg>
           {stay.area}
         </p>
+
         <div className="amenities" aria-label="Amenities">
           {stay.amenities.map((amenity) => (
             <span key={amenity}>{amenity}</span>
           ))}
         </div>
+
         <div className="stay-card-bottom">
-          <p><strong>{formatPrice(stay.price)}</strong><span> / month</span></p>
-          <span className="stay-details-link">View details <span aria-hidden="true">↗</span></span>
+          <p>
+            <strong>{formatPrice(stay.price)}</strong>
+            <span> / month</span>
+          </p>
+          <span className="stay-details-link">
+            View details <span aria-hidden="true">↗</span>
+          </span>
         </div>
       </div>
     </article>
@@ -324,31 +346,122 @@ function StayDetailsModal({ stay, onClose }) {
     >
       <div className="stay-dialog-layout">
         <img className="stay-dialog-image" src={stay.image} alt={stay.alt} />
+
         <div className="stay-dialog-content">
           <div className="stay-dialog-topline">
             <p className="stay-dialog-tag">{stay.tag}</p>
-            <button className="stay-dialog-close" type="button" onClick={onClose}>Close</button>
+            <button
+              className="stay-dialog-close"
+              type="button"
+              onClick={onClose}
+            >
+              Close
+            </button>
           </div>
+
           <h2 id="stay-dialog-title">{stay.name}</h2>
+
           <dl className="stay-dialog-facts">
             <div><dt>City</dt><dd>{stay.city}</dd></div>
             <div><dt>Locality</dt><dd>{locality}</dd></div>
             <div><dt>Accommodation type</dt><dd>{stay.type}</dd></div>
             <div><dt>Monthly rent</dt><dd>{formatPrice(stay.price)}</dd></div>
           </dl>
+
           <section className="stay-dialog-section">
             <h3>About this stay</h3>
             <p id="stay-dialog-description">{stay.description}</p>
           </section>
+
           <section className="stay-dialog-section">
             <h3>Available amenities</h3>
             <ul className="stay-dialog-amenities">
-              {stay.amenities.map((amenity) => <li key={amenity}>{amenity}</li>)}
+              {stay.amenities.map((amenity) => (
+                <li key={amenity}>{amenity}</li>
+              ))}
             </ul>
           </section>
         </div>
       </div>
     </dialog>
+  )
+}
+
+function AiSearchPanel({
+  message,
+  setMessage,
+  onSubmit,
+  onClear,
+  isLoading,
+  isActive,
+  error,
+}) {
+  return (
+    <section className="ai-search-panel" aria-labelledby="ai-search-title">
+      <div className="ai-search-copy">
+        <p className="eyebrow">A smarter way to find your stay</p>
+        <h2 id="ai-search-title">
+          Tell us what you <span>need.</span>
+        </h2>
+        <p>
+          Describe your budget, preferred locality, stay type, or amenities
+          in everyday language. AI will search our accommodation database.
+        </p>
+        <p className="ai-search-example">
+          Try: “Find a PG in Hinjawadi under ₹10,000 with Wi-Fi.”
+        </p>
+      </div>
+
+      <form className="ai-search-form" onSubmit={onSubmit}>
+        <label htmlFor="ai-search-input">
+          Describe your ideal accommodation
+        </label>
+
+        <textarea
+          id="ai-search-input"
+          value={message}
+          onChange={(event) => setMessage(event.target.value)}
+          placeholder="e.g. Find a PG in Hinjawadi under ₹10,000 with Wi-Fi"
+          rows={3}
+          maxLength={1000}
+          required
+          disabled={isLoading}
+        />
+
+        <div className="ai-search-actions">
+          <button
+            className="search-button"
+            type="submit"
+            disabled={isLoading}
+          >
+            {isLoading ? 'Searching...' : '✦ Search with AI'}
+          </button>
+
+          {isActive && (
+            <button
+              className="reset-button"
+              type="button"
+              onClick={onClear}
+              disabled={isLoading}
+            >
+              Clear AI search
+            </button>
+          )}
+        </div>
+
+        {isLoading && (
+          <p className="ai-search-feedback" role="status">
+            Understanding your requirements and searching the database...
+          </p>
+        )}
+
+        {error && (
+          <p className="ai-search-error" role="alert">
+            {error}
+          </p>
+        )}
+      </form>
+    </section>
   )
 }
 
@@ -358,28 +471,43 @@ function WhyChooseUs() {
       <div className="why-intro">
         <p className="eyebrow">A softer landing</p>
         <h2>New city.<br />New possibilities.</h2>
-        <p className="why-copy">Finding a place shouldn’t feel like another exam. We make the first step feel a little more like home.</p>
+        <p className="why-copy">
+          Finding a place shouldn’t feel like another exam. We make the first
+          step feel a little more like home.
+        </p>
       </div>
+
       <div className="why-points">
         <article className="why-point">
           <span className="point-number">01</span>
           <div>
             <h3>Made for student life</h3>
-            <p>Places and details that make the day-to-day easier, from study corners to shared kitchens.</p>
+            <p>
+              Places and details that make the day-to-day easier, from study
+              corners to shared kitchens.
+            </p>
           </div>
         </article>
+
         <article className="why-point">
           <span className="point-number">02</span>
           <div>
             <h3>Know what to expect</h3>
-            <p>Clear monthly prices and useful amenity details help you compare at your own pace.</p>
+            <p>
+              Clear monthly prices and useful amenity details help you compare
+              at your own pace.
+            </p>
           </div>
         </article>
+
         <article className="why-point">
           <span className="point-number">03</span>
           <div>
             <h3>A place to belong</h3>
-            <p>Discover welcoming ways to live, learn, and find your people in a new city.</p>
+            <p>
+              Discover welcoming ways to live, learn, and find your people in
+              a new city.
+            </p>
           </div>
         </article>
       </div>
@@ -395,6 +523,7 @@ function Footer() {
           <BrandMark />
           <p>A little closer to feeling at home.</p>
         </div>
+
         <div className="footer-links">
           <div>
             <h3>Discover</h3>
@@ -408,6 +537,7 @@ function Footer() {
           </div>
         </div>
       </div>
+
       <div className="footer-bottom">
         <span>© 2026 Smart Student Sojourn</span>
         <span>Sample listings shown for illustrative purposes only.</span>
@@ -432,6 +562,13 @@ function App() {
   const [selectedStay, setSelectedStay] = useState(null)
   const [sortOrder, setSortOrder] = useState('default')
 
+  // AI search state
+  const [aiMessage, setAiMessage] = useState('')
+  const [aiLoading, setAiLoading] = useState(false)
+  const [aiError, setAiError] = useState('')
+  const [aiSearchActive, setAiSearchActive] = useState(false)
+  const [aiResults, setAiResults] = useState([])
+
   useEffect(() => {
     const controller = new AbortController()
 
@@ -440,7 +577,7 @@ function App() {
       setLoadError('')
 
       try {
-        const response = await fetch('http://localhost:8080/api/accommodations', {
+        const response = await fetch(`${API_BASE_URL}/accommodations`, {
           signal: controller.signal,
         })
 
@@ -475,10 +612,8 @@ function App() {
 
   const localities = [
     ...new Map(
-      [...intendedLocalities, ...stays.map((stay) => getLocality(stay.area))].map((locality) => [
-        normalizeLocality(locality),
-        locality,
-      ])
+      [...intendedLocalities, ...stays.map((stay) => getLocality(stay.area))]
+        .map((locality) => [normalizeLocality(locality), locality])
     ).values(),
   ].sort((first, second) => first.localeCompare(second))
 
@@ -491,7 +626,8 @@ function App() {
       !filters.locality ||
       normalizeLocality(getLocality(stay.area)) === normalizeLocality(filters.locality)
 
-    const matchesType = filters.type === 'Any type' || stay.type === filters.type
+    const matchesType =
+      filters.type === 'Any type' || stay.type === filters.type
 
     const matchesBudget =
       filters.budget === 'Any budget' || stay.price < Number(filters.budget)
@@ -500,16 +636,76 @@ function App() {
   })
 
   const sortedStays = [...filteredStays].sort((a, b) => {
-    if (sortOrder === 'price-low-high') {
-      return a.price - b.price
-    }
-
-    if (sortOrder === 'price-high-low') {
-      return b.price - a.price
-    }
-
+    if (sortOrder === 'price-low-high') return a.price - b.price
+    if (sortOrder === 'price-high-low') return b.price - a.price
     return a.id - b.id
   })
+
+  // Send the user's natural-language request to the Spring Boot AI endpoint.
+  async function handleAiSearch(event) {
+    event.preventDefault()
+
+    const message = aiMessage.trim()
+
+    if (!message) {
+      setAiError('Please describe the accommodation you are looking for.')
+      return
+    }
+
+    setAiLoading(true)
+    setAiError('')
+    setAiSearchActive(false)
+    setAiResults([])
+
+    try {
+      const response = await fetch(
+        `${API_BASE_URL}/ai/search?message=${encodeURIComponent(message)}`
+      )
+
+      const data = await response.json().catch(() => ({}))
+
+      if (!response.ok) {
+        throw new Error(
+          data.message || 'AI search failed. Please try again.'
+        )
+      }
+
+      if (!Array.isArray(data.accommodations)) {
+        throw new Error('The AI search returned an unexpected response.')
+      }
+
+      console.log('AI search response:', data)
+
+        const mappedResults = data.accommodations.map(mapAccommodation)
+
+        console.log('Mapped AI results:', mappedResults)
+
+        setAiResults(mappedResults)
+        setAiSearchActive(true)
+
+      // Clear regular filters so they do not conflict with AI results.
+      setFilters({
+        city: '',
+        locality: '',
+        type: 'Any type',
+        budget: 'Any budget',
+      })
+      setSortOrder('default')
+    } catch (error) {
+      setAiError(
+        error.message || 'Could not complete AI search. Please try again.'
+      )
+    } finally {
+      setAiLoading(false)
+    }
+  }
+
+  function clearAiSearch() {
+    setAiMessage('')
+    setAiError('')
+    setAiSearchActive(false)
+    setAiResults([])
+  }
 
   function resetAllFilters() {
     setFilters({
@@ -519,7 +715,10 @@ function App() {
       budget: 'Any budget',
     })
     setSortOrder('default')
+    clearAiSearch()
   }
+
+  const visibleStays = aiSearchActive ? aiResults : sortedStays
 
   return (
     <>
@@ -532,10 +731,14 @@ function App() {
               <p className="eyebrow">
                 <span className="eyebrow-dot" /> Your next chapter starts here
               </p>
+
               <h1>Find your place<br />in a <span>new city.</span></h1>
+
               <p className="hero-description">
-                Thoughtful stays for student life. Find a room, meet your people, and make somewhere new feel like yours.
+                Thoughtful stays for student life. Find a room, meet your
+                people, and make somewhere new feel like yours.
               </p>
+
               <div className="hero-notes">
                 <span><b aria-hidden="true">✓</b> Made for student budgets</span>
                 <span><b aria-hidden="true">✓</b> Room to make it yours</span>
@@ -547,10 +750,12 @@ function App() {
                 src="https://images.unsplash.com/photo-1600607687939-ce8a6c25118c?auto=format&fit=crop&w=1300&q=90"
                 alt="Welcoming, sunlit shared apartment with leafy plants"
               />
+
               <div className="hero-sticker">
                 <span className="sticker-sun" aria-hidden="true">✳</span>
                 <span>Room to<br />feel at home</span>
               </div>
+
               <div className="hero-photo-caption">
                 <span className="caption-dot" /> A fresh start, your way
               </div>
@@ -558,20 +763,35 @@ function App() {
 
             <div className="search-wrap">
               <SearchPanel
-                onSearch={setFilters}
+                onSearch={(newFilters) => {
+                  clearAiSearch()
+                  setFilters(newFilters)
+                }}
                 localities={localities}
               />
             </div>
           </div>
+
           <div className="hero-curve" aria-hidden="true" />
         </section>
 
         <section className="featured-section" id="stays">
+          <AiSearchPanel
+            message={aiMessage}
+            setMessage={setAiMessage}
+            onSubmit={handleAiSearch}
+            onClear={clearAiSearch}
+            isLoading={aiLoading}
+            isActive={aiSearchActive}
+            error={aiError}
+          />
+
           <div className="section-heading">
             <div>
               <p className="eyebrow">A good place to begin</p>
               <h2>Stay a little <span>closer</span></h2>
             </div>
+
             <p className="section-aside">
               A few ideas for your next address.<br />
               Your story starts wherever you land.
@@ -591,12 +811,34 @@ function App() {
               id="sort-order"
               value={sortOrder}
               onChange={(event) => setSortOrder(event.target.value)}
+              disabled={aiSearchActive}
             >
               <option value="default">Default sorting</option>
               <option value="price-low-high">Price: Low to High</option>
               <option value="price-high-low">Price: High to Low</option>
             </select>
           </div>
+
+          {aiSearchActive && !isLoading && !loadError && (
+            <div className="ai-results-summary" role="status">
+              <div>
+                <h3>AI search results</h3>
+                <p>
+                  {aiResults.length > 0
+                    ? `${aiResults.length} matching accommodation${aiResults.length === 1 ? '' : 's'} found in the database.`
+                    : 'No matching accommodations found. Try changing your requirements.'}
+                </p>
+              </div>
+
+              <button
+                type="button"
+                className="reset-button"
+                onClick={clearAiSearch}
+              >
+                Show all stays
+              </button>
+            </div>
+          )}
 
           {isLoading ? (
             <div className="listing-status" role="status">
@@ -605,13 +847,16 @@ function App() {
           ) : loadError ? (
             <div className="listing-status listing-error" role="alert">
               <p>{loadError}</p>
-              <button type="button" onClick={() => setRetryCount((count) => count + 1)}>
+              <button
+                type="button"
+                onClick={() => setRetryCount((count) => count + 1)}
+              >
                 Try again
               </button>
             </div>
-          ) : sortedStays.length > 0 ? (
+          ) : visibleStays.length > 0 ? (
             <div className="stay-grid">
-              {sortedStays.map((stay) => (
+              {visibleStays.map((stay) => (
                 <StayCard
                   key={stay.id}
                   stay={stay}
@@ -619,12 +864,28 @@ function App() {
                 />
               ))}
             </div>
+          ) : aiSearchActive ? (
+            <div className="empty-state">
+              <span aria-hidden="true">⌕</span>
+              <h3>No matching stays found</h3>
+              <p>
+                Try another locality, budget, stay type, or amenity in your
+                AI search.
+              </p>
+              <button type="button" onClick={clearAiSearch}>
+                Show all stays
+              </button>
+            </div>
           ) : (
             <div className="empty-state">
               <span aria-hidden="true">⌕</span>
               <h3>No stays match those filters</h3>
-              <p>Try another city, locality, accommodation type, or budget.</p>
-              <button type="button" onClick={resetAllFilters}>Show all stays</button>
+              <p>
+                Try another city, locality, accommodation type, or budget.
+              </p>
+              <button type="button" onClick={resetAllFilters}>
+                Show all stays
+              </button>
             </div>
           )}
         </section>

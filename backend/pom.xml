@@ -36,6 +36,13 @@
             <artifactId>spring-boot-starter-jdbc</artifactId>
         </dependency>
 
+        <!-- JSON processing for Gemini API requests and responses -->
+        <dependency>
+            <groupId>com.fasterxml.jackson.core</groupId>
+            <artifactId>jackson-databind</artifactId>
+        </dependency>
+
+
         <!-- Input validation support -->
         <dependency>
             <groupId>org.springframework.boot</groupId>

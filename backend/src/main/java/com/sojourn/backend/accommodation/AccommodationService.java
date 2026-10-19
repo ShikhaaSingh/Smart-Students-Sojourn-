@@ -21,11 +21,25 @@ public class AccommodationService {
         return searchAccommodations(null, null, null, null);
     }
 
+    // Existing search method preserved for current frontend filters
     public List<AccommodationController.Accommodation> searchAccommodations(
             String city,
             String locality,
             String type,
             Integer maxRent) {
+
+        return searchAccommodations(
+                city, locality, type, maxRent, List.of()
+        );
+    }
+
+    // New search method supporting amenities such as Wi-Fi
+    public List<AccommodationController.Accommodation> searchAccommodations(
+            String city,
+            String locality,
+            String type,
+            Integer maxRent,
+            List<String> amenities) {
 
         StringBuilder sql = new StringBuilder("""
                 SELECT id, name, city, locality, accommodation_type,
@@ -56,6 +70,17 @@ public class AccommodationService {
             params.add(maxRent);
         }
 
+        if (amenities != null) {
+            for (String amenity : amenities) {
+                if (amenity != null && !amenity.isBlank()) {
+                    sql.append(
+                            " AND LOWER(COALESCE(amenities, '')) LIKE LOWER(?)"
+                    );
+                    params.add("%" + amenity.trim() + "%");
+                }
+            }
+        }
+
         sql.append(" ORDER BY id");
 
         return jdbcTemplate.query(
@@ -63,11 +88,11 @@ public class AccommodationService {
                 (rs, rowNum) -> {
                     String amenitiesText = rs.getString("amenities");
 
-                    List<String> amenities =
+                    List<String> accommodationAmenities =
                             amenitiesText == null || amenitiesText.isBlank()
                                     ? List.of()
                                     : Arrays.stream(amenitiesText.split(","))
-                                            .map(item -> item.strip())
+                                            .map(String::strip)
                                             .filter(item -> !item.isEmpty())
                                             .toList();
 
@@ -79,7 +104,7 @@ public class AccommodationService {
                             rs.getString("accommodation_type"),
                             rs.getInt("monthly_rent"),
                             rs.getString("description"),
-                            amenities
+                            accommodationAmenities
                     );
                 },
                 params.toArray()
